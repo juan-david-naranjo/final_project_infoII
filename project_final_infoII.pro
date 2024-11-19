@@ -10,10 +10,12 @@ CONFIG += c++17
 
 SOURCES += \
     main.cpp \
-    mainwindow.cpp
+    mainwindow.cpp \
+    protagonista.cpp
 
 HEADERS += \
-    mainwindow.h
+    mainwindow.h \
+    protagonista.h
 
 FORMS += \
     mainwindow.ui
