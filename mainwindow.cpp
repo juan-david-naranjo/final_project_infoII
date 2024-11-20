@@ -13,7 +13,7 @@ MainWindow::MainWindow(QWidget *parent)
     scene->setSceneRect(0, 0, sceneWidth, sceneHeight); // Establecer el rectángulo de la escena
 
     // Establecer el fondo de la escena con una imagen
-    QPixmap base("C:\\Users\\Lenovo\\Pictures\\Base simpsons.jpg"); // Imagen para el fondo
+    QPixmap base(":/scenas/sprites/fondo.jpg"); // Imagen para el fondo
     scene->setBackgroundBrush(base.scaled(sceneWidth, sceneHeight, Qt::IgnoreAspectRatio, Qt::SmoothTransformation));
 
     // Crear el protagonista (Bart)

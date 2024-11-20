@@ -1,3 +1,9 @@
 <RCC>
-    <qresource prefix="/new/bart"/>
+    <qresource prefix="/personaje">
+        <file>sprites/bart sprites 2.jpg</file>
+        <file>sprites/bart sprites.jpg</file>
+    </qresource>
+    <qresource prefix="/scenas">
+        <file>sprites/fondo.jpg</file>
+    </qresource>
 </RCC>
