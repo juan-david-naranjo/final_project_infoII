@@ -1,0 +1,7 @@
+<RCC>
+    <qresource prefix="/Bart">
+        <file>bart baile 2.png</file>
+        <file>bart simpson animation 2.jpg</file>
+        <file>Base simpsons.jpg</file>
+    </qresource>
+</RCC>
