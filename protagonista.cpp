@@ -16,14 +16,14 @@ Protagonista::Protagonista(int startX, int startY, QGraphicsPixmapItem *parent)
     setFocus(); // Otorgar el foco al protagonista para recibir eventos de teclado
 
     // Cargar la imagen predeterminada del protagonista desde la hoja de sprites
-    spriteSheet = QPixmap(":/RecursosJuego/Bart/bart simpson animation 2.jpg");
+    spriteSheet = QPixmap(":/personaje/sprites/bart sprites.jpg");
 
     // La imagen de Bart está en la fila 1, columna 1 de la hoja de sprites
     normalImage = spriteSheet.copy(0, 0, 39, 87);  // Ajusta el tamaño si es necesario
     setPixmap(normalImage); // Establece la imagen predeterminada de Bart
 
     // Intentar cargar la imagen para los gestos
-    QPixmap gestureSheet(":/RecursosJuego/Bart/bart baile 2.png");
+    QPixmap gestureSheet(":/personaje/sprites/bart sprites 2.jpg");
 
     // Verificar si la imagen se carga correctamente
     if (gestureSheet.isNull()) {

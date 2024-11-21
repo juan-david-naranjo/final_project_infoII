@@ -1,4 +1,4 @@
-QT       += core gui
+QT += core gui
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -11,10 +11,12 @@ CONFIG += c++17
 SOURCES += \
     main.cpp \
     mainwindow.cpp \
+    personaje.cpp \
     protagonista.cpp
 
 HEADERS += \
     mainwindow.h \
+    personaje.h \
     protagonista.h
 
 FORMS += \
@@ -26,4 +28,4 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
 
 RESOURCES += \
-    Recursos/RecursosJuego.qrc
+    png_juego.qrc
