@@ -17,7 +17,7 @@ MainWindow::MainWindow(QWidget *parent)
     scene->setBackgroundBrush(base.scaled(sceneWidth, sceneHeight, Qt::IgnoreAspectRatio, Qt::SmoothTransformation));
 
     // Crear el protagonista (Bart)
-    protagonista = new Protagonista(100, 500); // Crear una instancia de Protagonista con la posición (100, 500)
+    protagonista = new Protagonista(100, 500, nullptr);
     scene->addItem(protagonista); // Agregar el protagonista a la escena
 
     // Crear una vista para la escena

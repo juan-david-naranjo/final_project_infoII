@@ -1,19 +1,14 @@
 #include "protagonista.h"
-#include <QKeyEvent>
-#include <QTimer>
-#include <QGraphicsScene>
-#include <QGraphicsItem>
-#include <QPixmap>
-#include <QDebug>
 
-Protagonista::Protagonista(int startX, int startY, QGraphicsPixmapItem *parent)
-    : QGraphicsPixmapItem(parent), x(startX), y(startY), speed_x(0), speed_y(0),
-    health(100), lives(3), isDead(false), currentFrame(0),
-    timerAnimacion(nullptr), timerGesto(nullptr), healthBar(nullptr)
+Protagonista::Protagonista(int startX, int startY, QGraphicsPixmapItem* parent)
+    : Personaje(nullptr),  // Solo pasamos el parent al constructor de Personaje
+    QGraphicsPixmapItem(parent),
+    speed_x(0), speed_y(0), vidas(3), isDead(false),
+    currentFrame(0), currentGestoFrame(0)
 {
-    setPos(x, y); // Establece la posición inicial
-    setFlag(QGraphicsItem::ItemIsFocusable); // Hacer que el objeto sea "focusable"
-    setFocus(); // Otorgar el foco al protagonista para recibir eventos de teclado
+    posX = startX;   // Establecer la posición X
+    posY = startY;   // Establecer la posición Y
+    setPos(posX, posY);  // Usamos posX y posY para establecer la posición
 
     // Cargar la imagen predeterminada del protagonista desde la hoja de sprites
     spriteSheet = QPixmap(":/personaje/sprites/bart sprites.jpg");
@@ -33,14 +28,8 @@ Protagonista::Protagonista(int startX, int startY, QGraphicsPixmapItem *parent)
 
     // Inicializar las imágenes para el gesto
     for (int i = 0; i < 7; ++i) {
-        // Asegúrate de que los cuadros estén bien alineados en la imagen
         gestureFrames.append(gestureSheet.copy(i * 39, 0, 39, 87)); // Suponiendo que cada cuadro es de 39x87
     }
-
-    // Crear la barra de salud
-    healthBar = new QGraphicsRectItem(this);
-    healthBar->setRect(0, -10, health, 5);
-    healthBar->setBrush(Qt::green);
 
     // Inicializar las animaciones
     iniciarAnimaciones(false);
@@ -48,17 +37,18 @@ Protagonista::Protagonista(int startX, int startY, QGraphicsPixmapItem *parent)
 
 Protagonista::~Protagonista() {
     // Liberar recursos de los punteros
-    delete timerAnimacion;
-    delete timerGesto;
-    delete healthBar;
+    if (timerAnimacion) {
+        delete timerAnimacion;
+    }
+    if (timerGesto) {
+        delete timerGesto;
+    }
 }
 
-int Protagonista::getX() const {
-    return x;
-}
-
-int Protagonista::getY() const {
-    return y;
+void Protagonista::update() {
+    if (!isDead) {
+        mover(speed_x, speed_y);
+    }
 }
 
 void Protagonista::keyPressEvent(QKeyEvent* event) {
@@ -80,13 +70,12 @@ void Protagonista::keyPressEvent(QKeyEvent* event) {
         iniciarAnimaciones(true); // Iniciar animación de caminar a la derecha
         break;
     case Qt::Key_Space:
-        hacerGesto(5000); // Llamar con una duración específica de 2000 ms (2 segundos)
+        hacerGesto(5000); // Llamar con una duración específica de 5000 ms (5 segundos)
         break;
     default:
         break;
     }
 }
-
 
 void Protagonista::keyReleaseEvent(QKeyEvent* event) {
     switch (event->key()) {
@@ -131,19 +120,13 @@ void Protagonista::iniciarAnimaciones(bool haciaDerecha) {
     // Reiniciar la animación al cambiar de dirección
     timerAnimacion->start(100);
 }
-void Protagonista::update() {
-    if (!isDead) {
-        mover(speed_x, speed_y);
-    }
-}
 
 void Protagonista::mover(int dx, int dy) {
     QPointF nuevaPos = this->pos() + QPointF(dx, dy);
     this->setPos(nuevaPos);
 
-    x += dx;
-    y += dy;
-
+    posX += dx;
+    posY += dy;
 }
 
 void Protagonista::actualizarCaminar() {
@@ -151,8 +134,9 @@ void Protagonista::actualizarCaminar() {
     setPixmap((speed_x >= 0) ? framesCaminarDerecha[currentFrame] : framesCaminarIzquierda[currentFrame]);
 }
 
-void Protagonista::setCaminarDerecha() {
-    setPixmap(framesCaminarDerecha[currentFrame]);
+void Protagonista::IniciarAnimacion(bool) {
+    // Llamar al método que ya tienes para iniciar la animación del gesto
+    hacerGesto(5000);  // Hacer el gesto durante 5000 ms (5 segundos)
 }
 
 void Protagonista::hacerGesto(int duration) {
@@ -170,7 +154,6 @@ void Protagonista::hacerGesto(int duration) {
     });
 }
 
-
 void Protagonista::actualizarGesto() {
     setPixmap(gestureFrames[currentGestoFrame]);
     currentGestoFrame = (currentGestoFrame + 1) % gestureFrames.size();
@@ -185,15 +168,6 @@ void Protagonista::actualizarGesto() {
             ciclosCompletados = 0; // Reiniciar el contador
         }
     }
-}
-
-void Protagonista::recibirDano(int dano) {
-    health -= dano;
-    if (health <= 0) {
-        health = 0;
-        morir();
-    }
-    healthBar->setRect(0, -10, health, 5); // Actualiza el tamaño de la barra de salud
 }
 
 void Protagonista::morir() {
