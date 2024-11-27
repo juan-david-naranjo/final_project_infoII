@@ -2,6 +2,8 @@
     <qresource prefix="/personaje">
         <file>sprites/bart sprites 2.jpg</file>
         <file>sprites/bart sprites.jpg</file>
+        <file>sprites/sprites_bart.png</file>
+        <file>sprites/sprites_enemigos.png</file>
     </qresource>
     <qresource prefix="/scenas">
         <file>sprites/fondo.jpg</file>

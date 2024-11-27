@@ -2,10 +2,12 @@
 #include "ui_mainwindow.h"
 #include "protagonista.h"
 
-MainWindow::MainWindow(QWidget *parent)
-    : QMainWindow(parent)
-    , ui(new Ui::MainWindow)
-{
+MainWindow::MainWindow(QWidget* parent)
+    : QMainWindow(parent), protagonista(new Protagonista(0, 0)), timer(new QTimer(this)) {
+
+    connect(timer, &QTimer::timeout, protagonista, &Protagonista::update);
+    timer->start(16);
+
     ui->setupUi(this);
 
     // Configuración de la escena

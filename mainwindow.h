@@ -31,6 +31,7 @@ private:
     // Miembros para los elementos de la escena
     QGraphicsPixmapItem *bart; // El item que representa a Bart en la escena
     Protagonista *protagonista;           // El jugador (si lo usas)
+    QTimer *timer;
 
     int sceneWidth = 800;      // Ancho de la escena
     int sceneHeight = 600;     // Alto de la escena

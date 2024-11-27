@@ -3,63 +3,65 @@
 
 #include <QObject>
 #include <QGraphicsPixmapItem>
-#include <QGraphicsItem>
-#include <QGraphicsScene>
 #include <QKeyEvent>
-#include <QGraphicsRectItem>
 #include <QTimer>
 #include <QList>
-#include "personaje.h"  // Incluir la clase Personaje
+#include "personaje.h"  // Hereda de Personaje
 
-class Protagonista : public Personaje, public QGraphicsPixmapItem {  // Hereda de Personaje
+class Protagonista : public Personaje, public QGraphicsPixmapItem {
     Q_OBJECT
 
 public:
-    // Constructor que también inicializa la clase base Personaje
+    enum class Direction { Up, Down, Left, Right }; // Direcciones del protagonista
+
+    // Constructor y destructor
     Protagonista(int startX, int startY, QGraphicsPixmapItem* parent = nullptr);
     ~Protagonista();
 
-    // Métodos getter para obtener las posiciones
-    int getX() const;
-    int getY() const;
+    // Métodos getter para las posiciones
+    int getX() const { return x; }
+    int getY() const { return y; }
 
     // Sobrescribir eventos de teclado
     void keyPressEvent(QKeyEvent* event) override;
     void keyReleaseEvent(QKeyEvent* event) override;
 
+    // Actualización de movimiento y animación
     void update();
     void recibirDano(int dano);
 
-    // Implementar el método abstracto de Personaje
+    // Implementación de método abstracto de Personaje
     void IniciarAnimacion(bool caminar) override;
 
 private:
-    // Métodos internos para mover, animar y gestionar gestos
+    // Métodos internos para mover y animar
     void mover(int dx, int dy);
-    void iniciarAnimaciones(bool caminar);
-    void setCaminarDerecha();
-    void setCaminarIzquierda();  // Nueva función para caminar a la izquierda
-    void hacerGesto(int duration); // Agrega un parámetro opcional para duración del gesto
+    void actualizarAnimacion();
+    void hacerGesto(); // Duración del gesto (por defecto 1 segundo)
     void morir();
 
+    // Variables de movimiento y animación
+    int x, y;
     int speed_x, speed_y;
     int vidas;
     bool isDead;
-    int currentFrame;
-    int currentGestoFrame;
 
-    QPixmap spriteSheet;
-    QPixmap normalImage;
-    QList<QPixmap> framesCaminarDerecha;
-    QList<QPixmap> framesCaminarIzquierda; // Nueva lista para cuadros de caminar a la izquierda
-    QList<QPixmap> gestureFrames;
+    Direction direction; // Dirección actual del protagonista
+    bool animacionActiva; // Si la animación está activa
+    int frame; // Cuadro actual de la animación
 
+    // Recursos gráficos
+    QPixmap spriteSheet;     // Sprite completo
+    QPixmap framesReposo;    // Cuadro de reposo
+    QPixmap framesCaminarDerecha[8]; // Cuadros para caminar a la derecha
+    QPixmap framesSaltar[6]; // Cuadros para saltar
+    // Timers
     QTimer* timerAnimacion;
     QTimer* timerGesto;
+    QTimer* timer;
 
 public slots:
-    void actualizarCaminar();
-    void actualizarGesto();
+
 };
 
 #endif // PROTAGONISTA_H
