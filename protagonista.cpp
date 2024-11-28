@@ -1,54 +1,37 @@
 #include "protagonista.h"
 
-#include "protagonista.h"
-
 Protagonista::Protagonista(int startX, int startY, QGraphicsPixmapItem* parent)
     : QGraphicsPixmapItem(parent),
     x(startX), y(startY),
     speed_x(0), speed_y(0),
     vidas(3), isDead(false),
-    frame(0), direction(Direction::Right), animacionActiva(false),
-    timerAnimacion(nullptr), timerGesto(nullptr)
+    direction(Direction::Right), alternarFrame(false)
 {
     setPos(x, y);
-    setFlag(QGraphicsItem::ItemIsFocusable);
+    setFlag(QGraphicsItem::ItemIsFocusable);  // Permite que el protagonista reciba eventos del teclado
     setFocus();
 
-    // Cargar el sprite sheet
-    spriteSheet = QPixmap(":/personaje/sprites/sprites_bart.png");
-    if (spriteSheet.isNull()) {
-        qDebug() << "Error: No se pudo cargar el sprite sheet.";
+    // Cargar imágenes separadas
+    spriteReposo = QPixmap(":/scenas/sprites/sprites_bartreposo.png");
+    spriteCaminar1 = QPixmap(":/scenas/sprites/sprites_bartcaminar1.png");
+    spriteCaminar2 = QPixmap(":/scenas/sprites/sprites_bartcaminar2.png");
+    spriteSalto = QPixmap(":/scenas/sprites/sprites_bartsalto.png");
+
+    if (spriteReposo.isNull() || spriteCaminar1.isNull() || spriteCaminar2.isNull() || spriteSalto.isNull()) {
+        qDebug() << "Error: No se pudieron cargar todas las imágenes.";
     }
 
-    // Tamaño de cada cuadro
-    int frameWidth = 69;
-    int frameHeight = 55;
+    // Establecer la imagen inicial
+    setPixmap(spriteReposo);
 
-    // Dividir los cuadros de animación
-    framesReposo = spriteSheet.copy(0, 0, frameWidth, frameHeight); // Reposo (fila 1, columna 1)
-
-    // Caminar a la derecha (fila 2, columnas 1 a 8)
-    for (int i = 0; i < 8; ++i) {
-        framesCaminarDerecha[i] = spriteSheet.copy(i * frameWidth, frameHeight, frameWidth, frameHeight);
-    }
-
-    // Saltar (fila 3, columnas 1 a 6)
-    for (int i = 0; i < 6; ++i) {
-        framesSaltar[i] = spriteSheet.copy(i * frameWidth, 2 * frameHeight, frameWidth, frameHeight);
-    }
-
-    // Establecer el cuadro inicial
-    setPixmap(framesReposo);
+    animTimer = new QTimer(this);
+    connect(animTimer, &QTimer::timeout, this, &Protagonista::alternarFrameAnimacion);
+    animTimer->start(100); // Cambiar cada 500 ms (medio segundo)
 }
 
 Protagonista::~Protagonista() {
-    // Liberar recursos de los punteros
-    if (timerAnimacion) {
-        delete timerAnimacion;
-    }
-    if (timerGesto) {
-        delete timerGesto;
-    }
+
+    delete animTimer;
 }
 
 void Protagonista::keyPressEvent(QKeyEvent* event) {
@@ -65,7 +48,7 @@ void Protagonista::keyPressEvent(QKeyEvent* event) {
         break;
     case Qt::Key_Space: // Saltar
         if (speed_y == 0) { // Solo saltar si no estás en el aire
-            speed_y = -15; // Velocidad inicial del salto
+            speed_y = -20; // Velocidad inicial del salto
         }
         break;
     default:
@@ -85,15 +68,27 @@ void Protagonista::keyReleaseEvent(QKeyEvent* event) {
 }
 
 void Protagonista::update() {
-    // Aplicar gravedad
-    if (y + speed_y > 300) { // Si va a caer más allá del suelo
-        y = 300; // Colocarlo en el suelo
-        speed_y = 0;
-    } else {
-        y += speed_y;
+    // Aplicar gravedad y lógica de salto
+    if (speed_y < 0) { // Si está subiendo
+        if (y + speed_y <= 300 - 3 * saltoAltura) {  // Verificar si ha alcanzado la altura máxima
+            y = 300 - 3 * saltoAltura;  // Limitar la altura máxima del salto
+            speed_y = 0;  // Detener el ascenso
+        } else {
+            y += speed_y;  // Continuar subiendo
+            speed_y += gravedad;  // Aumentar la velocidad negativa (gravedad) mientras sube
+        }
+    } else {  // Si está cayendo
+        if (y + speed_y >= 300) {  // Si cae al suelo
+            y = 300;  // Colocarlo en el suelo
+            speed_y = 0;  // Detener el movimiento vertical
+        } else {
+            y += speed_y;  // Continuar cayendo
+            speed_y += gravedad;  // Aumentar la velocidad de caída
+        }
     }
-    mover(speed_x, speed_y);
-    actualizarAnimacion();
+
+    mover(speed_x, speed_y);  // Mover al protagonista
+    actualizarAnimacion();  // Actualizar la animación
 }
 
 void Protagonista::mover(int dx, int dy) {
@@ -105,72 +100,29 @@ void Protagonista::mover(int dx, int dy) {
 }
 
 void Protagonista::actualizarAnimacion() {
-    if (speed_x != 0 && speed_y == 0) { // Movimiento lateral
-        animacionActiva = true;
+    if (speed_y != 0) { // Saltando
+        setPixmap(direction == Direction::Right ? spriteSalto : spriteSalto.transformed(QTransform().scale(-1, 1)));
+    } else if (speed_x == 0) { // Quieto
+        setPixmap(direction == Direction::Right ? spriteReposo : spriteReposo.transformed(QTransform().scale(-1, 1)));
+    }
+}
 
-        // Cambiar el cuadro de caminar
-        frame = (frame + 1) % 8; // Hay 8 cuadros para caminar
+void Protagonista::alternarFrameAnimacion() {
+    if (speed_x != 0) { // Si el personaje se está moviendo
+        alternarFrame = !alternarFrame;
+        QPixmap currentSprite = alternarFrame ? spriteCaminar1 : spriteCaminar2;
+
         if (direction == Direction::Right) {
-            setPixmap(framesCaminarDerecha[frame]);
+            setPixmap(currentSprite); // Imagen normal
         } else if (direction == Direction::Left) {
-            setPixmap(framesCaminarDerecha[frame].transformed(QTransform().scale(-1, 1))); // Espejo
-        }
-
-    } else if (speed_y != 0) { // Saltando
-        animacionActiva = true;
-
-        // Cambiar el cuadro de saltar
-        frame = (frame + 1) % 6; // Hay 6 cuadros para saltar
-        setPixmap(framesSaltar[frame]);
-
-    } else {
-        animacionActiva = false;
-
-        // Cuadro de reposo
-        if (direction == Direction::Right) {
-            setPixmap(framesReposo);
-        } else if (direction == Direction::Left) {
-            setPixmap(framesReposo.transformed(QTransform().scale(-1, 1)));
+            setPixmap(currentSprite.transformed(QTransform().scale(-1, 1))); // Imagen invertida
         }
     }
 }
 
 
 void Protagonista::IniciarAnimacion(bool caminar) {
-    if (caminar) {
-        // Si se activa la animación de caminar, se inicia el temporizador
-        if (!timerAnimacion) {
-            timerAnimacion = new QTimer(this);
-            connect(timerAnimacion, &QTimer::timeout, this, &Protagonista::actualizarAnimacion);
-        }
-        timerAnimacion->start(100); // Cambia el cuadro cada 100 ms (puedes ajustar el tiempo)
-
-    } else {
-        // Si la animación no está activa, detenemos el temporizador
-        if (timerAnimacion && timerAnimacion->isActive()) {
-            timerAnimacion->stop();
-            frame = 0; // Reinicia el cuadro de la animación
-            setPixmap(framesReposo); // Muestra la imagen de reposo
-        }
-    }
-}
-
-
-void Protagonista::hacerGesto() {
-    /*
-    currentGestoFrame = 0;
-    if (!timerGesto) {  // Asegurarse de que no haya una instancia previa de timerGesto
-        timerGesto = new QTimer(this);
-        connect(timerGesto, &QTimer::timeout, this, &Protagonista::actualizarGesto);
-    }
-    timerGesto->start(100); // Cambiar la imagen cada 100 ms
-
-    // Establecer un temporizador para detener el gesto después de la duración especificada
-    QTimer::singleShot(duration, [this]() {
-        timerGesto->stop();
-        setPixmap(normalImage); // Volver a la imagen normal
-    });
-*/
+    // Ya no es necesario este método dado el nuevo sistema de animaciones.
 }
 
 void Protagonista::morir() {

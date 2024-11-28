@@ -1,11 +1,18 @@
 <RCC>
-    <qresource prefix="/personaje">
-        <file>sprites/bart sprites 2.jpg</file>
-        <file>sprites/bart sprites.jpg</file>
-        <file>sprites/sprites_bart.png</file>
-        <file>sprites/sprites_enemigos.png</file>
-    </qresource>
+    <qresource prefix="/personaje"/>
     <qresource prefix="/scenas">
         <file>sprites/fondo.jpg</file>
+        <file>sprites/sprites_arana1.png</file>
+        <file>sprites/sprites_arana2.png</file>
+        <file>sprites/sprites_bartArma1.png</file>
+        <file>sprites/sprites_bartArma2.png</file>
+        <file>sprites/sprites_bartburla1.png</file>
+        <file>sprites/sprites_bartburla2.png</file>
+        <file>sprites/sprites_bartcaminar1.png</file>
+        <file>sprites/sprites_bartcaminar2.png</file>
+        <file>sprites/sprites_bartsalto.png</file>
+        <file>sprites/sprites_raton1.png</file>
+        <file>sprites/sprites_raton2.png</file>
+        <file>sprites/sprites_bartreposo.png</file>
     </qresource>
 </RCC>

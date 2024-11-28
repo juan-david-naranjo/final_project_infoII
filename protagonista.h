@@ -5,7 +5,7 @@
 #include <QGraphicsPixmapItem>
 #include <QKeyEvent>
 #include <QTimer>
-#include <QList>
+#include <QPixmap>
 #include "personaje.h"  // Hereda de Personaje
 
 class Protagonista : public Personaje, public QGraphicsPixmapItem {
@@ -37,7 +37,6 @@ private:
     // Métodos internos para mover y animar
     void mover(int dx, int dy);
     void actualizarAnimacion();
-    void hacerGesto(); // Duración del gesto (por defecto 1 segundo)
     void morir();
 
     // Variables de movimiento y animación
@@ -47,21 +46,21 @@ private:
     bool isDead;
 
     Direction direction; // Dirección actual del protagonista
-    bool animacionActiva; // Si la animación está activa
-    int frame; // Cuadro actual de la animación
 
     // Recursos gráficos
-    QPixmap spriteSheet;     // Sprite completo
-    QPixmap framesReposo;    // Cuadro de reposo
-    QPixmap framesCaminarDerecha[8]; // Cuadros para caminar a la derecha
-    QPixmap framesSaltar[6]; // Cuadros para saltar
-    // Timers
-    QTimer* timerAnimacion;
-    QTimer* timerGesto;
-    QTimer* timer;
+    QPixmap spriteReposo;          // Imagen de reposo
+    QPixmap spriteCaminar1;        // Imagen de caminar (cuadro 1)
+    QPixmap spriteCaminar2;        // Imagen de caminar (cuadro 2)
+    QPixmap spriteSalto;           // Imagen de salto
+
+    double gravedad = 1;           // Fuerza de gravedad (ajustable)
+    double saltoAltura = 100;      // Altura máxima del salto
+
+    bool alternarFrame; // Alternar entre los cuadros de caminar
+    QTimer* animTimer;
 
 public slots:
-
+    void alternarFrameAnimacion();
 };
 
 #endif // PROTAGONISTA_H

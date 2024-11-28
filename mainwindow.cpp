@@ -1,6 +1,5 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
-#include "protagonista.h"
 
 MainWindow::MainWindow(QWidget* parent)
     : QMainWindow(parent), protagonista(new Protagonista(0, 0)), timer(new QTimer(this)) {
@@ -22,9 +21,19 @@ MainWindow::MainWindow(QWidget* parent)
     protagonista = new Protagonista(100, 500, nullptr);
     scene->addItem(protagonista); // Agregar el protagonista a la escena
 
+    // Crear los enemigos
+    enemigo1 = new enemigo(200, 100, enemigo::Tipo::Enemigo1);
+    enemigo2 = new enemigo(400, 100, enemigo::Tipo::Enemigo2);
+    enemigo3 = new enemigo(600, 100, enemigo::Tipo::Enemigo3);
+
+    // Agregar los enemigos a la escena
+    scene->addItem(enemigo1);
+    scene->addItem(enemigo2);
+    scene->addItem(enemigo3);
+
     // Crear una vista para la escena
     view = new QGraphicsView(scene, this); // Crear la vista
-    setCentralWidget(view); // Establecer la vista como el widget central de la ventana
+    setCentralWidget(view); // Establecer el widget central
 
     // Hacer al protagonista enfocable
     protagonista->setFlag(QGraphicsItem::ItemIsFocusable);
@@ -32,10 +41,26 @@ MainWindow::MainWindow(QWidget* parent)
 
     // Establecer el tamaño fijo de la ventana
     setFixedSize(sceneWidth, sceneHeight); // Establecer el tamaño de la ventana
+
+    // Iniciar un temporizador para actualizar el movimiento de los enemigos
+    connect(timer, &QTimer::timeout, protagonista, &Protagonista::update);
+    timer->start(16);
+    connect(timer, &QTimer::timeout, this, &MainWindow::actualizarEnemigos);
+    timer->start(16);
+}
+
+void MainWindow::actualizarEnemigos() {
+    // Actualizar el movimiento de cada enemigo
+    enemigo1->mover();
+    enemigo2->mover();
+    enemigo3->mover();
 }
 
 MainWindow::~MainWindow()
 {
     delete ui;
-    delete protagonista; // Eliminar el protagonista cuando la ventana se cierre
+    delete protagonista; // Eliminar el protagonista
+    delete enemigo1;     // Eliminar el enemigo1
+    delete enemigo2;     // Eliminar el enemigo2
+    delete enemigo3;     // Eliminar el enemigo3
 }
