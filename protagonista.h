@@ -7,6 +7,7 @@
 #include <QTimer>
 #include <QPixmap>
 #include "personaje.h"  // Hereda de Personaje
+#include "arma.h"
 
 class Protagonista : public Personaje, public QGraphicsPixmapItem {
     Q_OBJECT
@@ -32,6 +33,8 @@ public:
 
     // Implementación de método abstracto de Personaje
     void IniciarAnimacion(bool caminar) override;
+
+    void habilitarArma();
 
 private:
     // Métodos internos para mover y animar
@@ -59,8 +62,17 @@ private:
     bool alternarFrame; // Alternar entre los cuadros de caminar
     QTimer* animTimer;
 
+    arma* objArma;
+    bool ejecutarArma;                     // Indica si se puede usar el arma
+    QPixmap spriteArma1;           // Imagen del arma (cuadro 1)
+    QPixmap spriteArma2;           // Imagen del arma (cuadro 2)
+    bool alternarFrameArma;        // Alternar entre los cuadros del arma
+
+    void usarArma(bool usar);
+
 public slots:
     void alternarFrameAnimacion();
+    void alternarFrameArmaAnimacion();
 };
 
 #endif // PROTAGONISTA_H

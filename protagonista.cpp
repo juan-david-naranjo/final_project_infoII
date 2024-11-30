@@ -5,7 +5,8 @@ Protagonista::Protagonista(int startX, int startY, QGraphicsPixmapItem* parent)
     x(startX), y(startY),
     speed_x(0), speed_y(0),
     vidas(3), isDead(false),
-    direction(Direction::Right), alternarFrame(false)
+    direction(Direction::Right), alternarFrame(false),
+    ejecutarArma(false), alternarFrameArma(false)
 {
     setPos(x, y);
     setFlag(QGraphicsItem::ItemIsFocusable);  // Permite que el protagonista reciba eventos del teclado
@@ -17,6 +18,13 @@ Protagonista::Protagonista(int startX, int startY, QGraphicsPixmapItem* parent)
     spriteCaminar2 = QPixmap(":/scenas/sprites/sprites_bartcaminar2.png");
     spriteSalto = QPixmap(":/scenas/sprites/sprites_bartsalto.png");
 
+    spriteArma1 = QPixmap(":/scenas/sprites/sprites_bartArma1.png");
+    spriteArma2 = QPixmap(":/scenas/sprites/sprites_bartArma2.png");
+
+    if (spriteArma1.isNull() || spriteArma2.isNull()) {
+        qDebug() << "Error: No se pudieron cargar las imágenes del arma.";
+    }
+
     if (spriteReposo.isNull() || spriteCaminar1.isNull() || spriteCaminar2.isNull() || spriteSalto.isNull()) {
         qDebug() << "Error: No se pudieron cargar todas las imágenes.";
     }
@@ -26,7 +34,8 @@ Protagonista::Protagonista(int startX, int startY, QGraphicsPixmapItem* parent)
 
     animTimer = new QTimer(this);
     connect(animTimer, &QTimer::timeout, this, &Protagonista::alternarFrameAnimacion);
-    animTimer->start(100); // Cambiar cada 500 ms (medio segundo)
+    animTimer->start(100); // Cambiar cada 100 ms (medio segundo)
+
 }
 
 Protagonista::~Protagonista() {
@@ -47,8 +56,14 @@ void Protagonista::keyPressEvent(QKeyEvent* event) {
         direction = Direction::Right;
         break;
     case Qt::Key_Space: // Saltar
-        if (speed_y == 0) { // Solo saltar si no estás en el aire
-            speed_y = -20; // Velocidad inicial del salto
+        if (speed_y == 0) {
+            speed_y = -20;
+        }
+        break;
+    case Qt::Key_S: // Usar el arma
+        if (ejecutarArma) {
+            qDebug() << "Alternando frame de arma al presionar S.";
+            alternarFrameArmaAnimacion(); // Alternar la animación del arma
         }
         break;
     default:
@@ -56,11 +71,15 @@ void Protagonista::keyPressEvent(QKeyEvent* event) {
     }
 }
 
+
 void Protagonista::keyReleaseEvent(QKeyEvent* event) {
     switch (event->key()) {
     case Qt::Key_A:
     case Qt::Key_D:
         speed_x = 0;
+        break;
+    case Qt::Key_S: // Al soltar "S", mostrar la segunda animación
+        usarArma(false);
         break;
     default:
         break;
@@ -89,6 +108,15 @@ void Protagonista::update() {
 
     mover(speed_x, speed_y);  // Mover al protagonista
     actualizarAnimacion();  // Actualizar la animación
+
+    QList<QGraphicsItem*> itemsColisionados = collidingItems();
+    for (QGraphicsItem* item : itemsColisionados) {
+        arma* objArma = dynamic_cast<arma*>(item); // Verifica si el objeto es un arma
+        if (objArma) {
+            objArma->verificarColision(this); // Comprueba la colisión con el arma
+            habilitarArma(); // Activa el uso del arma
+        }
+    }
 }
 
 void Protagonista::mover(int dx, int dy) {
@@ -123,6 +151,30 @@ void Protagonista::alternarFrameAnimacion() {
 
 void Protagonista::IniciarAnimacion(bool caminar) {
     // Ya no es necesario este método dado el nuevo sistema de animaciones.
+}
+
+void Protagonista::alternarFrameArmaAnimacion() {
+    if (!ejecutarArma) return; // Si no tiene el arma, no hacer nada
+
+    alternarFrameArma = !alternarFrameArma;  // Alternar la animación
+    usarArma(alternarFrameArma); // Alternar entre las animaciones de arma
+}
+
+
+void Protagonista::habilitarArma() {
+    ejecutarArma = true; // Habilita el uso del arma
+}
+
+void Protagonista::usarArma(bool primeraAnimacion) {
+    if (!ejecutarArma) return; // Si no tiene el arma, no hace nada
+
+    QPixmap currentSprite = primeraAnimacion ? spriteArma1 : spriteArma2;
+
+    if (direction == Direction::Right) {
+        setPixmap(currentSprite); // Imagen normal
+    } else if (direction == Direction::Left) {
+        setPixmap(currentSprite.transformed(QTransform().scale(-1, 1))); // Imagen invertida
+    }
 }
 
 void Protagonista::morir() {

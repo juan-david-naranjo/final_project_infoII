@@ -14,5 +14,6 @@
         <file>sprites/sprites_raton1.png</file>
         <file>sprites/sprites_raton2.png</file>
         <file>sprites/sprites_bartreposo.png</file>
+        <file>sprites/tirachina.png</file>
     </qresource>
 </RCC>

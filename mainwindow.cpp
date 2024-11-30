@@ -42,6 +42,11 @@ MainWindow::MainWindow(QWidget* parent)
     // Establecer el tamaño fijo de la ventana
     setFixedSize(sceneWidth, sceneHeight); // Establecer el tamaño de la ventana
 
+    arma* miArma = new arma();
+    miArma->setPos(400, 300); // Posición inicial del arma
+    scene->addItem(miArma);
+
+
     // Iniciar un temporizador para actualizar el movimiento de los enemigos
     connect(timer, &QTimer::timeout, protagonista, &Protagonista::update);
     timer->start(16);

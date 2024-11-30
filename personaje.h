@@ -28,6 +28,7 @@ public:
 
     // Método puro (abstracto)
     virtual void IniciarAnimacion(bool caminar) = 0;
+    void habilitarArma();
 
 protected:
     double posX;       // Posición en X
