@@ -13,6 +13,7 @@ SOURCES += \
     enemigo.cpp \
     main.cpp \
     mainwindow.cpp \
+    nivel.cpp \
     obstaculo.cpp \
     personaje.cpp \
     protagonista.cpp \
@@ -23,6 +24,7 @@ HEADERS += \
     arma.h \
     enemigo.h \
     mainwindow.h \
+    nivel.h \
     obstaculo.h \
     personaje.h \
     protagonista.h \

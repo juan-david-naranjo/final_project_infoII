@@ -1,6 +1,6 @@
 #include "protagonista.h"
 
-Protagonista::Protagonista(int startX, int startY, QGraphicsPixmapItem* parent, arma* objArma)
+Protagonista::Protagonista(int startX, int startY, QGraphicsPixmapItem* parent)
     : QGraphicsPixmapItem(parent),
     x(startX), y(startY),
     speed_x(0), speed_y(0),
@@ -39,6 +39,8 @@ Protagonista::Protagonista(int startX, int startY, QGraphicsPixmapItem* parent, 
     animTimerArma = new QTimer(this);
     connect(animTimerArma, &QTimer::timeout, this, &Protagonista::alternarFrameArmaAnimacion);
     animTimerArma->start(100);
+
+    timer.start();
 }
 
 Protagonista::~Protagonista() {
@@ -65,12 +67,16 @@ void Protagonista::keyPressEvent(QKeyEvent* event) {
         break;
     case Qt::Key_S: // Usar el arma
         if (ejecutarArma) {
-            qDebug() << "Alternando frame de arma al presionar S.";
-            alternarFrameArmaAnimacion(); // Alternar la animación del arma
-            if (!animTimerArma->isActive()) {
-                animTimerArma->start(500);
+            // Verificar si ha pasado suficiente tiempo desde el último disparo
+            if (timer.elapsed() - lastShotTime >= shotInterval) {
+                qDebug() << "Alternando frame de arma al presionar S.";
+                alternarFrameArmaAnimacion(); // Alternar la animación del arma
+                if (!animTimerArma->isActive()) {
+                    animTimerArma->start(500);
+                }
+                dispararConArma();
+                lastShotTime = timer.elapsed();  // Actualizar el tiempo del último disparo
             }
-            dispararConArma();
         }
         break;
     default:
@@ -135,6 +141,8 @@ void Protagonista::mover(int dx, int dy) {
 
     x += dx;
     y += dy;
+
+    setPos(x, y);
 }
 
 void Protagonista::actualizarAnimacion() {
@@ -208,16 +216,12 @@ int Protagonista::obtenerDireccionDelProtagonista() {
     return 0; // Valor por defecto (derecha)
 }
 
-
 void Protagonista::dispararConArma() {
     if (ejecutarArma) {
         qDebug() << "Disparo de arma iniciado.";
 
-        // Obtén la dirección del protagonista para el disparo
-        bool angulo = obtenerDireccionDelProtagonista();  // Puede ser un booleano para derecha/izquierda o un ángulo más específico
-
         // Notificar a MainWindow para crear y disparar el proyectil
-        emit dispararProyectil(angulo);  // Emite una señal para disparar
+        emit dispararProyectil();  // Emite una señal para disparar
     }
 }
 

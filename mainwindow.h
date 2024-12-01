@@ -31,6 +31,7 @@ private:
 
     arma* miArma;
     proyectil* Min;
+    int angulo;
 
     // Miembros para los elementos de la escena
     QGraphicsPixmapItem *bart; // El item que representa a Bart en la escena
@@ -50,7 +51,6 @@ private:
 
 public slots:
     void dispararProyectil();
-    void crearProyectil(int angulo);
 };
 
 #endif // MAINWINDOW_H

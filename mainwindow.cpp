@@ -5,9 +5,6 @@
 MainWindow::MainWindow(QWidget* parent)
     : QMainWindow(parent) {
 
-    connect(timer, &QTimer::timeout, protagonista, &Protagonista::update);
-    timer->start(16);
-
     ui->setupUi(this);
 
     // Configuración de la escena
@@ -19,7 +16,7 @@ MainWindow::MainWindow(QWidget* parent)
     scene->setBackgroundBrush(base.scaled(sceneWidth, sceneHeight, Qt::IgnoreAspectRatio, Qt::SmoothTransformation));
 
     // Crear el protagonista (Bart)
-    protagonista = new Protagonista(100, 500, nullptr);
+    protagonista = new Protagonista(100, 100);
     scene->addItem(protagonista); // Agregar el protagonista a la escena
 
     // Crear los enemigos
@@ -48,12 +45,14 @@ MainWindow::MainWindow(QWidget* parent)
     scene->addItem(miArma);
 
     connect(miArma, &arma::armaRecogida, this, &MainWindow::dispararProyectil);
-    connect(protagonista, &Protagonista::dispararProyectil, this, &MainWindow::crearProyectil);
+    connect(protagonista, &Protagonista::dispararProyectil, this, &MainWindow::dispararProyectil);
 
     // Iniciar un temporizador para actualizar el movimiento de los enemigos
+    timer = new QTimer(this); // Inicializar el temporizador
     connect(timer, &QTimer::timeout, protagonista, &Protagonista::update);
     connect(timer, &QTimer::timeout, this, &MainWindow::actualizarEnemigos);
     timer->start(16);
+
 }
 
 void MainWindow::actualizarEnemigos() {
@@ -77,11 +76,8 @@ MainWindow::~MainWindow()
 
 void MainWindow::dispararProyectil() {
     // Cuando el arma es recogida, se dispara el proyectil desde la posición del protagonista
-    miArma->disparar(10, 0, protagonista->getX(), protagonista->getY());  // Usamos la posición del protagonista
-}
-
-void MainWindow::crearProyectil(int angulo) {
     // Convertir el ángulo (en grados) a radianes
+    angulo = protagonista->obtenerDireccionDelProtagonista();
     double radianes = qDegreesToRadians(angulo);
 
     // Calcular la velocidad en X y Y usando trigonometría
@@ -92,14 +88,10 @@ void MainWindow::crearProyectil(int angulo) {
     int startX = protagonista->getX();  // Usamos la posición del protagonista
     int startY = protagonista->getY();
 
-    // Crear el proyectil y agregarlo a la escena
-    Min = new proyectil(scene, startX, startY, velocidadX, velocidadY);
-
-    // Iniciar el movimiento del proyectil
-    scene->addItem(Min);
-    Min->iniciarMovimiento();
+     miArma->disparar(velocidadX, velocidadY, startX, startY);
 
     qDebug() << "¡Proyectil creado y disparado!";
+
 }
 
 

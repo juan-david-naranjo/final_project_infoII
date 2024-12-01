@@ -6,6 +6,7 @@
 #include <QKeyEvent>
 #include <QTimer>
 #include <QTime>
+#include <QElapsedTimer>
 #include <QPixmap>
 #include "personaje.h"  // Hereda de Personaje
 #include "arma.h"
@@ -17,7 +18,7 @@ public:
     enum class Direction { Up, Down, Left, Right }; // Direcciones del protagonista
 
     // Constructor y destructor
-    Protagonista(int startX, int startY, QGraphicsPixmapItem* parent = nullptr, arma* objArma = nullptr);
+    Protagonista(int startX, int startY, QGraphicsPixmapItem* parent = nullptr);
     ~Protagonista();
 
     // Métodos getter para las posiciones
@@ -68,6 +69,7 @@ private:
     bool alternarFrame; // Alternar entre los cuadros de caminar
     QTimer* animTimer;
     QTimer* animTimerArma;
+    QElapsedTimer timer;
 
     proyectil* Min;
     arma* objArma;
@@ -78,12 +80,15 @@ private:
 
     void usarArma(bool usar);
 
+    unsigned long lastShotTime = 0;  // Variable para almacenar el tiempo del último disparo
+    const unsigned long shotInterval = 500;
+
 public slots:
     void alternarFrameAnimacion();
     void alternarFrameArmaAnimacion();
 
 signals:
-    void dispararProyectil(bool angulo);
+    void dispararProyectil();
 };
 
 #endif // PROTAGONISTA_H
