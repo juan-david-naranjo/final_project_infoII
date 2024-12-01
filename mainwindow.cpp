@@ -1,8 +1,9 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
+#include <cmath>
 
 MainWindow::MainWindow(QWidget* parent)
-    : QMainWindow(parent), protagonista(new Protagonista(0, 0)), timer(new QTimer(this)) {
+    : QMainWindow(parent) {
 
     connect(timer, &QTimer::timeout, protagonista, &Protagonista::update);
     timer->start(16);
@@ -42,14 +43,15 @@ MainWindow::MainWindow(QWidget* parent)
     // Establecer el tamaño fijo de la ventana
     setFixedSize(sceneWidth, sceneHeight); // Establecer el tamaño de la ventana
 
-    arma* miArma = new arma();
+    miArma = new arma();
     miArma->setPos(400, 300); // Posición inicial del arma
     scene->addItem(miArma);
 
+    connect(miArma, &arma::armaRecogida, this, &MainWindow::dispararProyectil);
+    connect(protagonista, &Protagonista::dispararProyectil, this, &MainWindow::crearProyectil);
 
     // Iniciar un temporizador para actualizar el movimiento de los enemigos
     connect(timer, &QTimer::timeout, protagonista, &Protagonista::update);
-    timer->start(16);
     connect(timer, &QTimer::timeout, this, &MainWindow::actualizarEnemigos);
     timer->start(16);
 }
@@ -59,8 +61,8 @@ void MainWindow::actualizarEnemigos() {
     enemigo1->mover();
     enemigo2->mover();
     enemigo3->mover();
-}
 
+}
 MainWindow::~MainWindow()
 {
     delete ui;
@@ -68,4 +70,36 @@ MainWindow::~MainWindow()
     delete enemigo1;     // Eliminar el enemigo1
     delete enemigo2;     // Eliminar el enemigo2
     delete enemigo3;     // Eliminar el enemigo3
+    delete miArma;
+    delete Min;
+
 }
+
+void MainWindow::dispararProyectil() {
+    // Cuando el arma es recogida, se dispara el proyectil desde la posición del protagonista
+    miArma->disparar(10, 0, protagonista->getX(), protagonista->getY());  // Usamos la posición del protagonista
+}
+
+void MainWindow::crearProyectil(int angulo) {
+    // Convertir el ángulo (en grados) a radianes
+    double radianes = qDegreesToRadians(angulo);
+
+    // Calcular la velocidad en X y Y usando trigonometría
+    int velocidadX = cos(radianes) * 10; // Multiplicamos por un valor de velocidad (10 como ejemplo)
+    int velocidadY = sin(radianes) * 10; // Para dirección vertical, ajustamos si es necesario
+
+    // Obtener las posiciones iniciales del proyectil
+    int startX = protagonista->getX();  // Usamos la posición del protagonista
+    int startY = protagonista->getY();
+
+    // Crear el proyectil y agregarlo a la escena
+    Min = new proyectil(scene, startX, startY, velocidadX, velocidadY);
+
+    // Iniciar el movimiento del proyectil
+    scene->addItem(Min);
+    Min->iniciarMovimiento();
+
+    qDebug() << "¡Proyectil creado y disparado!";
+}
+
+

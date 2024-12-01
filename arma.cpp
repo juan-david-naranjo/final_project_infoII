@@ -1,4 +1,6 @@
 #include "arma.h"
+#include "proyectil.h" // Incluir la clase proyectil
+#include <QGraphicsScene>
 #include <QDebug>
 
 arma::arma(QObject *parent)
@@ -19,11 +21,16 @@ void arma::verificarColision(QGraphicsItem* protagonista) {
     }
 }
 
-void arma::disparar() {
+void arma::disparar(int velocidadX, int velocidadY, qreal posX, qreal posY) {
     if (recogida) {
         qDebug() << "¡Disparando proyectil!";
-        // Aquí implementarás la lógica de disparo, como crear un nuevo objeto de proyectil y agregarlo a la escena.
+
+        // Crear un proyectil en la posición del protagonista
+        proyectil* nuevoProyectil = new proyectil(scene(), posX, posY, velocidadX, velocidadY);
+        nuevoProyectil->iniciarMovimiento();
     } else {
         qDebug() << "¡El arma no ha sido recogida aún!";
     }
 }
+
+

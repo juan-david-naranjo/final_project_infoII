@@ -3,6 +3,8 @@
 
 #include <QObject>
 #include <QGraphicsPixmapItem>
+#include "proyectil.h"
+
 
 class arma : public QObject, public QGraphicsPixmapItem
 {
@@ -13,14 +15,17 @@ public:
     // Método para verificar colisión con el protagonista
     void verificarColision(QGraphicsItem* protagonista);
 
-    // Método para disparar proyectiles
-    void disparar();
+    // Método para disparar proyectiles, tomando como parámetros la dirección y velocidad
+    void disparar(int velocidadX, int velocidadY, qreal posX, qreal posY);
+
+    int getVelocidad();
 
 signals:
     void armaRecogida(); // Señal emitida cuando el arma es recogida por el protagonista
 
 private:
     bool recogida; // Indica si el arma ya fue recogida
+
 };
 
 #endif // ARMA_H

@@ -5,6 +5,7 @@
 #include <QGraphicsPixmapItem>
 #include <QKeyEvent>
 #include <QTimer>
+#include <QTime>
 #include <QPixmap>
 #include "personaje.h"  // Hereda de Personaje
 #include "arma.h"
@@ -16,7 +17,7 @@ public:
     enum class Direction { Up, Down, Left, Right }; // Direcciones del protagonista
 
     // Constructor y destructor
-    Protagonista(int startX, int startY, QGraphicsPixmapItem* parent = nullptr);
+    Protagonista(int startX, int startY, QGraphicsPixmapItem* parent = nullptr, arma* objArma = nullptr);
     ~Protagonista();
 
     // Métodos getter para las posiciones
@@ -35,6 +36,10 @@ public:
     void IniciarAnimacion(bool caminar) override;
 
     void habilitarArma();
+    void ejecutarArmaAnimacion();
+    void dispararConArma();
+    int obtenerDireccionDelProtagonista();
+    void setArma(arma* nuevaArma);
 
 private:
     // Métodos internos para mover y animar
@@ -47,6 +52,7 @@ private:
     int speed_x, speed_y;
     int vidas;
     bool isDead;
+    bool angulo;
 
     Direction direction; // Dirección actual del protagonista
 
@@ -56,12 +62,14 @@ private:
     QPixmap spriteCaminar2;        // Imagen de caminar (cuadro 2)
     QPixmap spriteSalto;           // Imagen de salto
 
-    double gravedad = 1;           // Fuerza de gravedad (ajustable)
+    const unsigned int gravedad = 1;           // Fuerza de gravedad (ajustable)
     double saltoAltura = 100;      // Altura máxima del salto
 
     bool alternarFrame; // Alternar entre los cuadros de caminar
     QTimer* animTimer;
+    QTimer* animTimerArma;
 
+    proyectil* Min;
     arma* objArma;
     bool ejecutarArma;                     // Indica si se puede usar el arma
     QPixmap spriteArma1;           // Imagen del arma (cuadro 1)
@@ -73,6 +81,9 @@ private:
 public slots:
     void alternarFrameAnimacion();
     void alternarFrameArmaAnimacion();
+
+signals:
+    void dispararProyectil(bool angulo);
 };
 
 #endif // PROTAGONISTA_H

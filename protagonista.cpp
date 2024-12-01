@@ -1,12 +1,12 @@
 #include "protagonista.h"
 
-Protagonista::Protagonista(int startX, int startY, QGraphicsPixmapItem* parent)
+Protagonista::Protagonista(int startX, int startY, QGraphicsPixmapItem* parent, arma* objArma)
     : QGraphicsPixmapItem(parent),
     x(startX), y(startY),
     speed_x(0), speed_y(0),
     vidas(3), isDead(false),
     direction(Direction::Right), alternarFrame(false),
-    ejecutarArma(false), alternarFrameArma(false)
+    ejecutarArma(false), alternarFrameArma(false), angulo(0), objArma(nullptr)
 {
     setPos(x, y);
     setFlag(QGraphicsItem::ItemIsFocusable);  // Permite que el protagonista reciba eventos del teclado
@@ -36,6 +36,9 @@ Protagonista::Protagonista(int startX, int startY, QGraphicsPixmapItem* parent)
     connect(animTimer, &QTimer::timeout, this, &Protagonista::alternarFrameAnimacion);
     animTimer->start(100); // Cambiar cada 100 ms (medio segundo)
 
+    animTimerArma = new QTimer(this);
+    connect(animTimerArma, &QTimer::timeout, this, &Protagonista::alternarFrameArmaAnimacion);
+    animTimerArma->start(100);
 }
 
 Protagonista::~Protagonista() {
@@ -64,6 +67,10 @@ void Protagonista::keyPressEvent(QKeyEvent* event) {
         if (ejecutarArma) {
             qDebug() << "Alternando frame de arma al presionar S.";
             alternarFrameArmaAnimacion(); // Alternar la animación del arma
+            if (!animTimerArma->isActive()) {
+                animTimerArma->start(500);
+            }
+            dispararConArma();
         }
         break;
     default:
@@ -80,6 +87,7 @@ void Protagonista::keyReleaseEvent(QKeyEvent* event) {
         break;
     case Qt::Key_S: // Al soltar "S", mostrar la segunda animación
         usarArma(false);
+        animTimerArma->stop();
         break;
     default:
         break;
@@ -111,10 +119,12 @@ void Protagonista::update() {
 
     QList<QGraphicsItem*> itemsColisionados = collidingItems();
     for (QGraphicsItem* item : itemsColisionados) {
-        arma* objArma = dynamic_cast<arma*>(item); // Verifica si el objeto es un arma
-        if (objArma) {
-            objArma->verificarColision(this); // Comprueba la colisión con el arma
+        arma* armaColisionada = dynamic_cast<arma*>(item); // Verifica si el objeto es un arma
+        if (armaColisionada) {
+            armaColisionada->verificarColision(this); // Comprueba la colisión con el arma
+            setArma(armaColisionada); // Asigna la referencia del arma al protagonista
             habilitarArma(); // Activa el uso del arma
+            qDebug() << "El protagonista ha recogido un arma.";
         }
     }
 }
@@ -128,6 +138,9 @@ void Protagonista::mover(int dx, int dy) {
 }
 
 void Protagonista::actualizarAnimacion() {
+    if (ejecutarArma) {
+        return; // No hacer nada y evitar mostrar la animación de reposo
+    }
     if (speed_y != 0) { // Saltando
         setPixmap(direction == Direction::Right ? spriteSalto : spriteSalto.transformed(QTransform().scale(-1, 1)));
     } else if (speed_x == 0) { // Quieto
@@ -155,7 +168,6 @@ void Protagonista::IniciarAnimacion(bool caminar) {
 
 void Protagonista::alternarFrameArmaAnimacion() {
     if (!ejecutarArma) return; // Si no tiene el arma, no hacer nada
-
     alternarFrameArma = !alternarFrameArma;  // Alternar la animación
     usarArma(alternarFrameArma); // Alternar entre las animaciones de arma
 }
@@ -163,11 +175,16 @@ void Protagonista::alternarFrameArmaAnimacion() {
 
 void Protagonista::habilitarArma() {
     ejecutarArma = true; // Habilita el uso del arma
+    objArma = ejecutarArma ? objArma : nullptr;  // Asegúrate de que objArma esté apuntando al arma correcta
+}
+
+void Protagonista::setArma(arma* nuevaArma) {
+    objArma = nuevaArma; // Asignar el puntero del arma
+    qDebug() << "El protagonista ahora tiene un arma.";
 }
 
 void Protagonista::usarArma(bool primeraAnimacion) {
     if (!ejecutarArma) return; // Si no tiene el arma, no hace nada
-
     QPixmap currentSprite = primeraAnimacion ? spriteArma1 : spriteArma2;
 
     if (direction == Direction::Right) {
@@ -176,6 +193,34 @@ void Protagonista::usarArma(bool primeraAnimacion) {
         setPixmap(currentSprite.transformed(QTransform().scale(-1, 1))); // Imagen invertida
     }
 }
+
+// Método corregido para obtener la dirección como valor entero (en grados)
+int Protagonista::obtenerDireccionDelProtagonista() {
+    if (direction == Direction::Right) {
+        return 0;   // Dirección de 0 grados (derecha)
+    } else if (direction == Direction::Left) {
+        return 180; // Dirección de 180 grados (izquierda)
+    } else if (direction == Direction::Up) {
+        return 90;  // Dirección de 90 grados (arriba)
+    } else if (direction == Direction::Down) {
+        return 270; // Dirección de 270 grados (abajo)
+    }
+    return 0; // Valor por defecto (derecha)
+}
+
+
+void Protagonista::dispararConArma() {
+    if (ejecutarArma) {
+        qDebug() << "Disparo de arma iniciado.";
+
+        // Obtén la dirección del protagonista para el disparo
+        bool angulo = obtenerDireccionDelProtagonista();  // Puede ser un booleano para derecha/izquierda o un ángulo más específico
+
+        // Notificar a MainWindow para crear y disparar el proyectil
+        emit dispararProyectil(angulo);  // Emite una señal para disparar
+    }
+}
+
 
 void Protagonista::morir() {
     isDead = true;

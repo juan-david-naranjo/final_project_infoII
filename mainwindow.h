@@ -29,6 +29,9 @@ private:
     QGraphicsScene *scene;    // La escena donde se colocan los elementos
     QGraphicsView *view;      // La vista para mostrar la escena
 
+    arma* miArma;
+    proyectil* Min;
+
     // Miembros para los elementos de la escena
     QGraphicsPixmapItem *bart; // El item que representa a Bart en la escena
     Protagonista *protagonista;  // El protagonista del juego
@@ -44,6 +47,10 @@ private:
 
     // Método para actualizar enemigos
     void actualizarEnemigos();
+
+public slots:
+    void dispararProyectil();
+    void crearProyectil(int angulo);
 };
 
 #endif // MAINWINDOW_H
