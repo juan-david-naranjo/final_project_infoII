@@ -1,3 +1,4 @@
+
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include <cmath>
@@ -16,7 +17,7 @@ MainWindow::MainWindow(QWidget* parent)
     scene->setBackgroundBrush(base.scaled(sceneWidth, sceneHeight, Qt::IgnoreAspectRatio, Qt::SmoothTransformation));
 
     // Crear el protagonista (Bart)
-    protagonista = new Protagonista(100, 100);
+    protagonista = new Protagonista(100, 200);
     scene->addItem(protagonista); // Agregar el protagonista a la escena
 
     // Crear los enemigos
@@ -41,7 +42,7 @@ MainWindow::MainWindow(QWidget* parent)
     setFixedSize(sceneWidth, sceneHeight); // Establecer el tamaño de la ventana
 
     miArma = new arma();
-    miArma->setPos(400, 300); // Posición inicial del arma
+    miArma->setPos(400, 100); // Posición inicial del arma
     scene->addItem(miArma);
 
     connect(miArma, &arma::armaRecogida, this, &MainWindow::dispararProyectil);
@@ -66,9 +67,6 @@ MainWindow::~MainWindow()
 {
     delete ui;
     delete protagonista; // Eliminar el protagonista
-    delete enemigo1;     // Eliminar el enemigo1
-    delete enemigo2;     // Eliminar el enemigo2
-    delete enemigo3;     // Eliminar el enemigo3
     delete miArma;
     delete Min;
 
@@ -88,10 +86,8 @@ void MainWindow::dispararProyectil() {
     int startX = protagonista->getX();  // Usamos la posición del protagonista
     int startY = protagonista->getY();
 
-     miArma->disparar(velocidadX, velocidadY, startX, startY);
+    miArma->disparar(velocidadX, velocidadY, startX, startY);
 
     qDebug() << "¡Proyectil creado y disparado!";
 
 }
-
-

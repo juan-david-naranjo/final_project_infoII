@@ -8,8 +8,9 @@
 #include <QTime>
 #include <QElapsedTimer>
 #include <QPixmap>
-#include "personaje.h"  // Hereda de Personaje
+#include "personaje.h"
 #include "arma.h"
+#include "enemigo.h"
 
 class Protagonista : public Personaje, public QGraphicsPixmapItem {
     Q_OBJECT
@@ -47,6 +48,7 @@ private:
     void mover(int dx, int dy);
     void actualizarAnimacion();
     void morir();
+    void perderVida();
 
     // Variables de movimiento y animación
     int x, y;

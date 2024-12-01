@@ -53,16 +53,16 @@ void Protagonista::keyPressEvent(QKeyEvent* event) {
 
     switch (event->key()) {
     case Qt::Key_A: // Mover a la izquierda
-        speed_x = -5;
+        speed_x = -3;
         direction = Direction::Left;
         break;
     case Qt::Key_D: // Mover a la derecha
-        speed_x = 5;
+        speed_x = 3;
         direction = Direction::Right;
         break;
     case Qt::Key_Space: // Saltar
         if (speed_y == 0) {
-            speed_y = -20;
+            speed_y = -10;
         }
         break;
     case Qt::Key_S: // Usar el arma
@@ -131,6 +131,25 @@ void Protagonista::update() {
             setArma(armaColisionada); // Asigna la referencia del arma al protagonista
             habilitarArma(); // Activa el uso del arma
             qDebug() << "El protagonista ha recogido un arma.";
+        }
+    }
+    for (QGraphicsItem* item : itemsColisionados) {
+        enemigo* enemigoColisionado = dynamic_cast<enemigo*>(item); // Verifica si es un enemigo
+        if (enemigoColisionado) {
+            // El protagonista ha colisionado con un enemigo, reducir vida
+            perderVida();
+            break; // Salir del bucle después de la primera colisión
+        }
+    }
+}
+
+void Protagonista::perderVida() {
+    if (vidas > 0) {
+        vidas--;  // Reducir vida
+        qDebug() << "Vida restante: " << vidas;
+        if (vidas == 0) {
+            isDead = true;
+            morir();  // Si no hay vidas, el protagonista muere
         }
     }
 }

@@ -1,3 +1,4 @@
+
 #include "nivel.h"
 
 Nivel::Nivel(QGraphicsScene* scene) : scene(scene) {

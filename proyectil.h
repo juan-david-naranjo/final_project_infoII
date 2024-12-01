@@ -5,6 +5,7 @@
 #include <QGraphicsEllipseItem>
 #include <QTimer>
 #include <QGraphicsScene>
+#include <enemigo.h>
 
 class proyectil : public QObject, public QGraphicsEllipseItem
 {

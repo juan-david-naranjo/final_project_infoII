@@ -35,11 +35,11 @@ enemigo::enemigo(int startX, int startY, Tipo tipo, QObject *parent)
     setPixmap(imagen1);
 
     if (tipoEnemigo == Tipo::Enemigo1 || tipoEnemigo == Tipo::Enemigo2) {
-        speed_x = 5; // Movimiento horizontal
+        speed_x = 2; // Movimiento horizontal
         speed_y = 0;
     } else if (tipoEnemigo == Tipo::Enemigo3) {
         speed_x = 0; // Movimiento vertical
-        speed_y = 5;
+        speed_y = 2;
     }
 
     timerAnimacion->start(200); // Alternar cada medio segundo

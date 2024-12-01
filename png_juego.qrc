@@ -15,5 +15,9 @@
         <file>sprites/sprites_raton2.png</file>
         <file>sprites/sprites_bartreposo.png</file>
         <file>sprites/tirachina.png</file>
+        <file>sprites/ciudad1.jpg</file>
+        <file>sprites/cuidad2.jpg</file>
+        <file>sprites/cuidad3.jpg</file>
+        <file>sprites/cuidad4.jpg</file>
     </qresource>
 </RCC>

@@ -36,10 +36,18 @@ private:
     // Miembros para los elementos de la escena
     QGraphicsPixmapItem *bart; // El item que representa a Bart en la escena
     Protagonista *protagonista;  // El protagonista del juego
-    enemigo *enemigo1;           // Puntero para el enemigo 1
-    enemigo *enemigo2;           // Puntero para el enemigo 2
-    enemigo *enemigo3;           // Puntero para el enemigo 3
-    QTimer *timer;               // Temporizador para las actualizaciones
+    enemigo *enemigo1 = nullptr;
+    enemigo *enemigo2 = nullptr;
+    enemigo *enemigo3 = nullptr;
+    enemigo *enemigo4 = nullptr;
+    enemigo *enemigo5 = nullptr;
+    enemigo *enemigo6 = nullptr;
+    enemigo *enemigo7 = nullptr;
+    enemigo *enemigo8 = nullptr;
+    enemigo *enemigo9 = nullptr;
+    enemigo *enemigo10 = nullptr;
+    enemigo *enemigo11 = nullptr;
+    QTimer *timer;
 
     // Dimensiones de la escena
     int sceneWidth = 800;      // Ancho de la escena

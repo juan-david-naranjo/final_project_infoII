@@ -40,16 +40,31 @@ void proyectil::actualizarPosicion() {
     x += speedX;
     y += speedY;
 
-    // Aplicar la gravedad (aceleración en Y)
+    // Aplicar la gravedad
     speedY += gravedad;
 
     // Mover el proyectil
     setPos(x, y);
 
+    // Verificar colisión con enemigos
+    QList<QGraphicsItem*> itemsColisionados = collidingItems();
+    for (QGraphicsItem* item : itemsColisionados) {
+        enemigo* enemigoColisionado = dynamic_cast<enemigo*>(item); // Verifica si es un enemigo
+        if (enemigoColisionado) {
+            // El proyectil ha colisionado con un enemigo, eliminarlo
+            scene()->removeItem(enemigoColisionado);  // Eliminar el enemigo de la escena
+            delete enemigoColisionado;  // Eliminar el enemigo de la memoria
+            emit destruido();  // El proyectil también se destruye
+            delete this;  // El proyectil se elimina de la escena
+            return;  // Salir después de la primera colisión
+        }
+    }
+
     // Verificar si el proyectil ha salido de la pantalla
-    if (y > 500 || x < 0 || x > scene()->width()) {  // Si sale por los límites X o Y
+    if (y > 500 || x < 0 || x > scene()->width()) {
         emit destruido();
-        delete this; // El proyectil se elimina cuando sale de la escena
+        delete this;  // El proyectil se elimina cuando sale de la escena
     }
 }
+
 
