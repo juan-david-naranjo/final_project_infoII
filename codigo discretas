@@ -1,0 +1,54 @@
+import sympy as sp
+from sympy.abc import x, y
+
+domain_x = range(-10, 11)
+domain_y = range(-10, 11)
+
+
+def existential_quantifier(predicate, domain_x, domain_y):
+
+    for i in domain_x:
+        found = False
+        for j in domain_y:
+            if predicate(i, j):
+                found = True
+                break
+        if (found):
+            return True
+            break
+       
+    return False
+
+def universal_quantifier(predicate, domain_x, domain_y):
+
+    for i in domain_x:
+        found = False
+        for j in domain_y:
+            if predicate(i, j):
+                found = True
+                break
+        if (not found):
+            return False
+            break
+    return True
+    
+def universal_quantifierx0(predicate, x0, domain_y):
+    
+    found = False
+    for j in domain_y:
+        if predicate(x0, j):
+            found = True
+            break
+    if (not found):
+        return False
+    return True    
+    
+P = lambda x, y: (x + y)>0 
+Q= lambda x,y: (x*x)+(y*y)>0    
+   
+    
+
+print("∀x∀y P(x,y):", universal_quantifier(P, domain_x, domain_y))
+print("∃x∀y P(x,y):", existential_quantifier(P, domain_x, domain_y))
+print("∀y Q(x,y):", universal_quantifierx0(Q, domain_x[0], domain_y))
+print("∃x∀y Q(x,y):", existential_quantifier(Q, domain_x, domain_y))
